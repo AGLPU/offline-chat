@@ -1,0 +1,93 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/settings__appearance"
+        android:textColor="@color/colorAccent"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <RelativeLayout
+        android:id="@+id/rl_chat_bg_color_button"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:paddingEnd="16dp"
+        android:paddingStart="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="16dp"
+            android:layout_toStartOf="@+id/v_color"
+            android:text="@string/settings__chat_background_color"
+            android:textSize="16sp" />
+
+        <View
+            android:id="@+id/v_color"
+            android:layout_width="36dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            tools:background="@android:color/holo_orange_dark" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/tv_notifications_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/settings__notifications"
+        android:textColor="@color/colorAccent"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <com.aman.bluetoothchat.ui.widget.SwitchPreference
+        android:id="@+id/sp_sound"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:preferenceText="@string/settings__sound" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/settings__discovery"
+        android:textColor="@color/colorAccent"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <com.aman.bluetoothchat.ui.widget.SwitchPreference
+        android:id="@+id/sp_class_filter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:preferenceText="@string/settings__classification" />
+    <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adView"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-3136435737091654/3885932324">
+    </com.google.android.gms.ads.AdView>
+</LinearLayout>

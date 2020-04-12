@@ -1,0 +1,104 @@
+package com.aman.bluetoothchat
+
+import android.app.Activity
+import android.app.Application
+import android.arch.lifecycle.Lifecycle
+import android.arch.lifecycle.LifecycleObserver
+import android.arch.lifecycle.OnLifecycleEvent
+import android.arch.lifecycle.ProcessLifecycleOwner
+import android.os.StrictMode
+import com.crashlytics.android.Crashlytics
+import com.aman.bluetoothchat.data.model.BluetoothConnector
+import com.aman.bluetoothchat.data.model.ProfileManager
+import com.aman.bluetoothchat.di.*
+import com.aman.bluetoothchat.ui.activity.ChatActivity
+import com.aman.bluetoothchat.ui.activity.ConversationsActivity
+import com.aman.bluetoothchat.ui.util.StartStopActivityLifecycleCallbacks
+import com.kobakei.ratethisapp.RateThisApp
+import com.squareup.leakcanary.LeakCanary
+import io.fabric.sdk.android.Fabric
+import org.koin.android.ext.android.get
+import org.koin.android.ext.android.inject
+import org.koin.android.ext.android.startKoin
+
+class ChatApplication : Application(), LifecycleObserver {
+
+    var isConversationsOpened = false
+    var currentChat: String? = null
+
+    private val connector: BluetoothConnector by inject()
+
+    override fun onCreate() {
+        super.onCreate()
+
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            return
+        }
+        LeakCanary.install(this)
+
+        if (!BuildConfig.DEBUG) {
+            Fabric.with(this, Crashlytics())
+        }
+
+        startKoin(this, listOf(applicationModule,
+                bluetoothConnectionModule, databaseModule, localStorageModule, viewModule))
+
+        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+
+        registerActivityLifecycleCallbacks(object : StartStopActivityLifecycleCallbacks() {
+
+            override fun onActivityStarted(activity: Activity?) {
+
+                isConversationsOpened = activity is ConversationsActivity
+
+                if (activity is ChatActivity) {
+                    currentChat = activity.intent.getStringExtra(ChatActivity.EXTRA_ADDRESS)
+                }
+            }
+
+            override fun onActivityStopped(activity: Activity?) {
+
+                if (activity is ConversationsActivity) {
+                    isConversationsOpened = false
+                }
+
+                if (activity is ChatActivity) {
+                    currentChat = null
+                }
+            }
+        })
+
+        val config = RateThisApp.Config().apply {
+            setTitle(R.string.rate_dialog__title)
+            setMessage(R.string.rate_dialog__message)
+            setYesButtonText(R.string.rate_dialog__rate)
+            setNoButtonText(R.string.rate_dialog__no)
+            setCancelButtonText(R.string.rate_dialog__cancel)
+        }
+        RateThisApp.init(config)
+
+        if (BuildConfig.DEBUG) {
+
+            StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .build())
+            StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .build())
+        }
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    internal fun prepareConnection() {
+        if (!get<ProfileManager>().getUserName().isEmpty()) {
+            connector.prepare()
+        }
+    }
+
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+    internal fun releaseConnection() {
+        connector.release()
+    }
+}
